@@ -1,0 +1,427 @@
+\documentclass[11pt]{article}
+
+% Packages for Latex document
+\usepackage[utf8]{inputenc}
+
+% Used for expanding text space
+\usepackage[a4paper, margin=20mm]{geometry}
+
+% Used for \mathbb{} function
+\usepackage{amssymb}
+
+% Used for \text{} function
+\usepackage{amsmath}
+
+% Used for writing algorithms
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+
+% Additional formatting
+\setlength{\parindent}{0em}
+\setlength{\parskip}{0em}
+
+% Begin the document
+\begin{document}
+
+% Title card
+\begin{titlepage}
+    
+    % Implement a title
+    \title{Trading Strategy Back-Tester and Bot Trader Creation}
+    
+    % Implement the author
+    \author{Ivan Silajev}
+    
+    % Use date section for extra info
+    \date{
+    % State organisation
+    Warwick Coding Society \\
+    % State e-mail of authors
+    \texttt{ivan.silajev@warwick.ac.uk}
+    }
+    
+    % Create the title section in PDF
+    \maketitle
+    
+    % Implement the contents section
+    \tableofcontents
+    
+\end{titlepage}
+
+% Start introduction section
+\section{Introduction}
+
+% Introduction: 
+% Sentence for stating what the document is about
+This \textbf{Warwick Coding Society} report outlines the theory and the creation of a \textbf{trading strategy back-testing program and a bot trader} using the \textbf{Python} programming language. 
+\nolinebreak
+% Sentence for stating how the document presents the information
+This document's approach to presenting the theory involves giving a simple explanation of the relevant topics before introducing the mathematics for the topics. 
+\nolinebreak
+% Sentence stating that the document is a programming tutorial as well
+The reader can also follow the code shown throughout the report to practice building their own trading toolkit, which is designed to be flexible.\\
+
+% List mentioning the most important topics the document
+The topics covered in this report include:
+\begin{itemize}
+    \item What is \textbf{trading} and \textbf{arbitrage}?
+    \item What is a \textbf{trading strategy} and how use it?
+    \item What is \textbf{portfolio optimisation} and how it's done?
+\end{itemize}
+
+% Sentence for showing existing packages for back testing and portfolio optimisation
+The report will also cover existing back testing and portfolio optimisation Python packages like \textbf{Backtrader} and \textbf{PyPortfolioOpt}.\\
+
+% Sentence explaining the motivation for writing the document
+The motivation for this report is to introduce programmers of any skill level to algorithmic trading and back testing in a clear, concise manner, in line with Warwick Coding Society's goal of making programming accessible. 
+\nolinebreak
+% Sentence also mentioning collaborative intention behind document
+This report is also part of a collaboration project with the WFS Quant Finance Team. 
+\nolinebreak
+% Sentence mentioning how collaborative aspect stands out
+This WCS report was made to perfectly complement the WFS report on 'trading strategy comparisons', as one can replicate the results in that report with the tools they learn in this one.
+
+% Start trading basics section
+\section{Trading Basics}
+
+% Section on what is trading
+\subsection{What is Trading?}
+
+% A general definition of trading
+\textbf{Trading} is the exchange of value between two entities.
+\nolinebreak
+% A general definition of a market
+A \textbf{market} is a field where entities trade.
+\nolinebreak
+% Mention what the most active markets are with examples
+The most active markets in the world today comprise of financial asset markets, including the \textbf{New York Stock Exchange (NYSE)} and the \textbf{National Association of Securities Dealers Automated Quotations (NASDAQ)}.\\
+
+% Motivate the reason for focusing on financial markets only
+\textbf{Financial asset markets} are ever-trending due to their increasing accessibility to the general public and the ease with which one can trade financial assets. 
+\nolinebreak
+% State that reason restricts document to financial markets only, though information is applicable to any market
+For this reason, this report will be focusing on financial asset markets only, though the methodology presented here is applicable to any market.\\
+
+% Give extra insight on past of algorithmic trading
+With the progress of computer technology and financial mathematics in the late 20th century, companies, like \textbf{Renaissance Technologies}, investigated the use of algorithmic trading strategies to automate and optimise their trading activity in financial asset markets.
+\nolinebreak
+% State that algorithmic trading is now accessible more than ever
+Currently, anyone can access financial markets through the many internet brokers that exist, opening the opportunity for anyone to use algorithmic trading methods to automate their trading activity.\\
+
+% State there are two ways of profiting from financial asset trading
+There are two common ways to earn profit from trading in financial asset markets.
+
+% List trading profiting techniques
+\begin{itemize}
+
+    % Explain long trading
+    \item \textbf{Buying (Long Position)}: When one buys an asset on the market at an agreed price and time. Then, they sell the asset on the market when the it increases in price, thus profiting from the increase in the price.
+    
+    % Explain short trading
+    \item \textbf{Selling (Short Position)}: When one loans assets from the broker and sells them on the market at an agreed price and time. Then, they buy back the asset when it decreases in price and return it to the broker, thus profiting from the decrease in the price.
+    
+\end{itemize}
+
+% Point to extra resources for the curious
+For more details on how brokers, financial markets and assets work, the reader can resort to the resources mentioned in this report's bibliography.
+
+% Start section on arbitrage
+\subsection{What is Arbitrage?}
+
+% Give a definition of arbitrage
+\textbf{Arbitrage} involves exploiting inefficiencies across markets to trade more profitably.\\
+
+% Give a definition of arbitrage opportunity
+An \textbf{arbitrage opportunity} is characterised by the potential of investing a net zero worth of capital into assets and profiting from them without risk.
+\nolinebreak
+% Give a simpler definition of arbitrage opportunity that highlights its significance
+Simply put, an arbitrage opportunity can give something from nothing without loss.\\
+
+% Explain how can arbitrage opportunities be found
+Arbitrage opportunities are found using information that efficiently reflect the current demand for different assets, allowing one to essentially predict what asset will be profitable. 
+\nolinebreak
+% State the generality of arbitrage for markets
+Again, arbitrage is a general concept that is applicable to any set of markets.\\
+
+% List basic sources of arbitrage opportunity info sources
+The common methods of arbitrage opportunity detection include:
+\begin{itemize}
+    
+    % State space models for trend analysis and using MPO for optimising portfolio
+    \item Multivariate trend analysis
+    
+    % Sentiment analysis and other web scraping
+    \item Internet social trend analysis
+    
+\end{itemize}
+
+% State that there are more sources of arbitrage opportunity information
+This is by no means an exhaustive list of arbitrage opportunity detection methods.
+
+% Start section on trading strategy utilisation
+\section{Trading Strategy Utilisation Theory}
+
+% Give a general definition of a trading strategy
+A \textbf{trading strategy} is a rule for when and how to trade an asset over time given a set of information.
+\nolinebreak
+% State that trading strategies have a standard
+We start by outlining what we expect from a trading strategy.
+
+% Start section explaining what a good trading strategy is
+\subsection{The Characteristics of a Good Trading Strategy}
+
+\subsubsection{General Description}
+
+% State the goal of trading
+The aim of trade is to achieve \textbf{profit}. 
+\nolinebreak
+% Restate the different ways to trade on financial markets
+One can trade in the financial market by either opening long or short positions on financial assets.\\
+
+% How to trade profitably with long positions
+\textbf{Long positions} are profitable when assets are bought at low prices and sold at higher prices. 
+\nolinebreak
+% How to trade profitably with short positions
+\textbf{Short positions} are profitable when assets are sold at high prices and bought at lower prices.\\
+
+% Summarise the properties of a profitable trading strategy
+Therefore, a good trading strategy:
+\begin{itemize}
+    \item Opens and holds long positions while the asset price increases
+    \item Opens and holds short positions while the asset price decreases
+    \item Closes long positions when the asset price starts decreasing
+    \item Closes short positions when the asset price starts increasing
+\end{itemize}
+
+% Create section for initial mathematical concepts
+\subsubsection{Mathematical Preliminaries}
+
+% Start with defining the time domain
+Define the set of times for which the price data of a given asset is observed as the countable set $T \subset \mathbb{R}$.\\
+
+% Define the four price series
+Brokers and financial websites provide data on the historical prices of assets, including the close, open, low and high prices of assets for different time intervals.
+\nolinebreak
+Define the close, open, low and high prices as follows:
+\begin{itemize}
+    \item Close price series: $P_{c}:T \mapsto \mathbb{R^{+}}$
+    \item Open price series: $P_{o}:T \mapsto \mathbb{R^{+}}$
+    \item Low price series: $P_{l}:T \mapsto \mathbb{R^{+}}$
+    \item High price series: $P_{h}:T \mapsto \mathbb{R^{+}}$
+\end{itemize}
+
+These series can be used for the construction of \textbf{indicator series}.
+
+% Introduce indicator series
+\subsection{Indicator Series}
+
+\subsubsection{General Description}
+
+% State what type of information trading strategies require for being good
+A trading strategy involves using information about the asset price trend. 
+\nolinebreak
+% State the form in which this information exists in
+This information is usually in the form of a time series, known as an \textbf{indicator series}, that shows when the price asset is increasing or decreasing.\\
+
+% Summarise what an indicator series represents
+An indicator series is:
+\begin{itemize}
+    \item Positive when the price is increasing
+    \item Negative when the price is decreasing
+    \item Zero when the price is stable
+\end{itemize}
+
+% Begin mathematical description of an indicator series
+\subsubsection{Mathematical Description}
+
+
+Define an indicator time series $I:T \mapsto \mathbb{R}$ as a function of time.\\
+
+An example of a trivial indicator series is the difference between the close and open prices of the asset traded:
+\begin{center}
+    $I(t) = P_c(t) - P_o(t)$
+\end{center}
+
+Another example of a trivial indicator series involves using the first order difference of the closed prices:
+\begin{center}
+    $I(t) = P_c(t) - P_c(t - \Delta_t)$
+\end{center}
+
+Where $\Delta_t$ is the difference between time $t$ and the latest time before $t$ in set $T$, or, more precisely: 
+\begin{center}
+    $\Delta_t = t - \sup \left ( T \cap (\infty, t) \right )$
+\end{center}
+
+Deriving reliable indicators is a separate science that quant traders specialise in. The WFS report on trading strategy comparisons gives some insight into the most commonly used indicators to date.
+
+\subsection{Trade Signal Series}
+
+\subsubsection{General Description}
+
+A \textbf{trade signal series} gives information on when a given trade type should be open according to an underlying indicator series.\\
+
+The long trade signal series is:
+\begin{itemize}
+    \item Equal to one when the indicator is strictly positive
+    \item Equal to zero otherwise
+\end{itemize}
+
+The short trade signal series is:
+\begin{itemize}
+    \item Equal to one when the indicator is strictly negative
+    \item Equal to zero otherwise
+\end{itemize}
+
+\subsubsection{Mathematical Description}
+
+The \textbf{long trade signal series} $V_l:T \mapsto \{ 0,1 \}$ is defined as:
+\begin{center}
+    $V_l(t) = \text{sign}(\text{max}\{I(t),0 \})$
+\end{center}
+
+The \textbf{short trade signal series} $V_s(t)$ is trivially derived by changing the sign of the indicator.
+\begin{center}
+    $V_s(t) = \text{sign}(\text{max}\{-I(t),0 \})$
+\end{center}
+
+\subsection{Action Series}
+
+\subsubsection{General Description}
+
+An \textbf{action series} informs exactly when to open or close trades of a given type based on its underlying trade signal series.\\
+
+The action series is:
+\begin{itemize}
+    \item Equal to one when the trade must be opened
+    \item Equal to zero when the position must be held (inaction)
+    \item Equal to minus one when the trade must be closed
+\end{itemize}
+
+\subsubsection{Mathematical Description}
+
+The \textbf{action series} $A:T \mapsto \{ -1,0,1 \}$, for a given trade signal series $V(t)$, is defined as:
+\begin{center}
+    $A(t) = \begin{cases}
+V(t) & \text{ if } t= \inf{T}\\ 
+V(t) - V(t - \Delta_t) & \text{ if }  t > \inf{T}
+\end{cases}$
+\end{center}
+
+
+
+\subsection{Alpha Series}
+
+Finally, the \textbf{alpha series} shows the ratio of the value of the investment with its previous value at all times under the use of a trading strategy.\\
+
+When the trade is inactive, the alpha series will take the value one, since no capital is invested in the asset. When the trade is active, the alpha series will output the ratio change in the investment according to the price series.\\
+
+The alpha series of a given asset and trading strategy is what's used to evaluate the performance of the trading strategy for the asset.
+
+\subsubsection{Mathematical Description}
+
+The alpha series $\alpha : T \mapsto \mathbb{R}^{+}$, for a given trade signal series $V(t)$ and action series $A(t)$, is generated using the following algorithm:
+
+\begin{algorithmic}[1]
+\REQUIRE $T \wedge V(t) \wedge A(t) \wedge P_c(t) \wedge r$
+\ENSURE $\alpha(t)$
+\FOR{$t = \inf T$ \TO $\sup T$}
+\IF{$A(t) = 1$}
+\STATE $\alpha(t) \leftarrow 1$
+\STATE $P_0 \leftarrow P_c(t)$
+\ELSIF{$A(t) = 0$}
+\IF{$V(t) = 0$}
+\STATE $\alpha(t) \leftarrow 1$
+\ELSIF{$V(t) = 1$}
+\STATE $\alpha(t) \leftarrow (P_0 + r \cdot (P_c(t) - P_0))/(P_0 + r \cdot (P_c(t- \Delta_t) - P_0))$
+\ENDIF
+\ELSIF{$A(t) = -1$}
+\STATE $\alpha(t) \leftarrow (P_0 + r \cdot (P_c(t) - P_0))/(P_0 + r \cdot (P_c(t- \Delta_t) - P_0))$
+\ENDIF
+\ENDFOR
+\end{algorithmic}
+The $r$ term is the proportion of invested capital dedicated to the trade. A positive $r$ generates an alpha series for a long position strategy and a negative $r$ generates an alpha series for a short position strategy.
+
+\section{Portfolio Implementation Theory}
+
+\subsection{Why are Portfolios Important?}
+A \textbf{trading portfolio} is an allocation of capital dedicated to a set of assets for trade. Portfolios can significantly affect the efficiency of one's trading activity. Dedicating a more capital into assets with volatile prices may be irrational if there exist more stable assets with higher average returns.\\
+
+The \textbf{volatility} of a random variable is its degree of variation. An asset price that deviate more from its trend that anther asset price is more volatile than the other. Usually, portfolios are optimised according to the volatility and average returns of the asset prices.
+
+\subsection{Portfolio Distribution Series}
+
+Since a portfolio is an allocation of capital, it is expressed as a vector function called a \textbf{portfolio distribution series} $\pi:T \mapsto [0,1]^{n}$ with entries summing to one. The $i$th entry of $\pi(t)$, is the proportion $\pi_{i}(t)$ of capital dedicated towards asset $i \in I$ for trade at time $t \in T$, where $I$ is the index set for the assets.\\
+
+Setting $\alpha_{i}(t)$ to be the alpha series of the $i$th asset, define the portfolio alpha series as follows:
+\begin{center}
+    $\alpha_{\pi}(t)=\sum_{i \in I}\alpha_{i}(t)\pi_{i}(t)$
+\end{center}
+
+The \textbf{portfolio alpha series} is shows the ratio of the value of the total invested capital with its previous value at all times.
+
+\subsection{The Equal Weight Portfolio}
+
+The \textbf{equal weight portfolio}, or the \textbf{trivial portfolio}, is one that uniformly allocates capital across all assets that are being traded. Letting $V_i(t)$ be the trade signal series of asset $i \in I$, the trivial portfolio is such that:
+\begin{center}
+    $\pi_i(t) = \begin{cases}
+    \dfrac{V_i(t)}{\sum_{i \in I}V_i(t)} & \text{ if } \sum_{i \in I}V_i(t) \neq 0 \\
+    0 & \text{ if } \sum_{i \in I}V_i(t) = 0
+    \end{cases}$
+\end{center}
+
+\subsection{Markowitz Modern Portfolio Theory}
+
+\textbf{Markowitz MPT (Modern Portfolio Theory)} one of the most successful and useful portfolio optimisation methods created and used to date. MPT optimises a portfolio by maximising its average returns and minimising its variance, used as a measure of volatility in this case. It utilises information on the returns of individual assets, including their average returns and return covariances.\\
+
+Let $\mu(t)$ be the \textbf{vector of average returns} of all assets in $I$ at time $t \in T$. So, $\mu_{i}(t)$ is the average returns of asset $i$ at time $t$.\\
+
+Let $\Sigma(t)$ be the \textbf{matrix of covariances between returns} of all assets in $I$ at time $t \in T$. So, $\Sigma_{ij}(t)$ is the covariance between the returns of asset $i$ and $j$ at time $t$.\\
+
+Let $d(t)$ be the \textbf{wealth distribution}, showing the proportion of wealth to be invested in each asset. The wealth distribution is different to the portfolio distribution $\pi(t)$, since the entries of $d(t)$ can be any real value all summing to one. $d_i(t)$ is the wealth distributed to asset $i$ at time $t$.\\
+
+The entries of the portfolio distribution are derived from the wealth distribution as follows:
+\begin{center}
+    $\pi_i(t) = \dfrac{|d_i(t)|}{\sum_{i \in I}|d_i(t)|}$
+\end{center}
+
+
+
+\newpage
+
+There exist two special wealth distributions.
+\begin{itemize}
+    \item The \textbf{minimal variance risky wealth distribution}:
+    \begin{center}
+        $d_M(t) = \dfrac{\Sigma^{-1}(t) \cdot \mathbf{1}}{\mathbf{1}^{T} \cdot \Sigma^{-1}(t) \cdot \mathbf{1}}$
+    \end{center}
+    With its corresponding average return $d_M(t) \cdot \mu(t)= \mu_M(t)$.
+    \item The \textbf{zero rate tangency wealth distribution}:
+    \begin{center}
+        $d_T(t) = \dfrac{\Sigma^{-1}(t) \cdot \mu(t)}{\mathbf{1}^{T} \cdot \Sigma^{-1}(t) \cdot \mu(t)}$
+    \end{center}
+    With its corresponding average return $d_T(t) \cdot \mu(t)= \mu_T(t)$.
+\end{itemize}
+
+
+The \textbf{optimal wealth distribution} is derived by solving the following optimisation problem for some desired average return $\mu_0(t)$:
+\begin{center}
+        $\begin{matrix}
+\text{minimise} & d(t)^T \cdot \Sigma(t) \cdot d(t), & d(t) \in \mathbb{R}^{n} \\
+\text{subject to} & d(t) \cdot \mathbf{1}=1, & \\ 
+ & d(t) \cdot \mu(t) \geq \mu_0(t) & 
+\end{matrix}$
+    \end{center}
+
+The problem involves deriving the wealth distribution that minimises the variance of the total returns with a set of necessary constraints. The unique solution to the problem is given by:
+\begin{center}
+    $d_0(t)= \dfrac{\mu_T(t) - \mu_0(t)}{\mu_T(t) - \mu_M(t)} d_M(t) + \dfrac{\mu_0(t) - \mu_M(t)}{\mu_T(t) - \mu_M(t)} d_T(t)$
+\end{center}
+
+Therefore, it is best to use $d_0(t)$ for a desired average returns of $\mu_0(t)$.
+
+\section{Back Testing and Trading Bot Implementation}
+
+
+
+\end{document}
